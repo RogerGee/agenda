@@ -87,10 +87,11 @@ task_file::task_file(const char* name)
         }
     } catch (file_does_not_exist) {}
     _name = name;
+    _modified = false;
 }
 task_file::~task_file()
 {
-    if (_tasks.size() > 0) {
+    if (_modified) {
         vector<const task*> tasks;
         binwriter writer(_name);
         for (auto iter = _tasks.begin();iter != _tasks.end();++iter)
@@ -108,14 +109,21 @@ task* task_file::new_task(task_kind kind,const string& desc,const date_t& date)
     t->_desc = desc;
     t->_date = date;
     _tasks[t->get_id()] = t;
+    _modified = true;
     return t;
 }
-const task* task_file::remove(uint32_t id)
+void task_file::add_task(task* item)
+{
+    _tasks[item->get_id()] = item;
+    _modified = true;
+}
+task* task_file::remove(uint32_t id)
 {
     auto iter = _tasks.find(id);
     if (iter != _tasks.end()) {
-        const task* t = iter->second;
+        task* t = iter->second;
         _tasks.erase(iter); // just erases the reference
+        _modified = true;
         return t;
     }
     return NULL;
@@ -126,7 +134,9 @@ void task_file::remove_outdated(task_file& dest,vector<const task*>& removed)
     for (auto iter = _tasks.begin();iter != _tasks.end();++iter) {
         if (iter->second->_date < now) {
             dest._tasks[iter->second->get_id()] = iter->second;
+            dest._modified = true;
             removed.push_back(iter->second);
+            _modified = true;
         }
     }
     // remove items from the collection (this can't be done while iterating)
@@ -152,6 +162,8 @@ task* task_file::get_task(uint32_t id)
     } catch (out_of_range ex) {
         return NULL;
     }
+    // assume a modification will be made
+    _modified = true;
     return t;
 }
 const task* task_file::get_task(uint32_t id) const

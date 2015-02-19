@@ -8,7 +8,7 @@ DO_DEBUG = true
 endif
 
 ifdef DO_DEBUG
-COMPILE = g++ -g -c -Wall -pedantic-errors -Werror -Wextra -Wshadow -Wfatal-errors -Wno-unused-variable --std=c++11
+COMPILE = g++ -g -c -Wall -pedantic-errors -Werror -Wextra -Wshadow -Wfatal-errors -Wno-unused-variable --std=c++11 -DAGENDA_DEBUG
 LINK = g++
 OBJDIR = dobj
 PROGRAM = agenda-debug

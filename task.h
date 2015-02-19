@@ -47,6 +47,12 @@ namespace agenda
         const date_t& get_date() const
         { return _date; }
 
+        void set_desc(const std::string& desc)
+        { _desc = desc; }
+        void set_kind(task_kind kind)
+        { _kind = kind; }
+        void set_date(const date_t& date)
+        { _date = date; }
     private:
         task(task_kind kind);
         task(binreader&);
@@ -66,7 +72,8 @@ namespace agenda
         ~task_file();
 
         task* new_task(task_kind kind,const std::string& desc,const date_t& date); // create new task
-        const task* remove(uint32_t id); // return removed task or NULL if not found
+        void add_task(task* item);
+        task* remove(uint32_t id); // return removed task or NULL if not found
         void remove_outdated(task_file& dest,std::vector<const task*>& removed); // remove all outdated tasks and place in destination task_file
 
         void print(std::ostream&) const;
@@ -79,6 +86,7 @@ namespace agenda
         static uint32_t _idTop;
         const char* _name;
         std::unordered_map<uint32_t,task*> _tasks;
+        bool _modified;
     };
 }
 

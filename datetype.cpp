@@ -381,7 +381,7 @@ string date_t::to_date_string_withtime(bool full) const
         tod = hr<=11 ? "AM" : "PM";
         if (hr == 0)
             hr = 12;
-        else if (hr > 13)
+        else if (hr >= 13)
             hr -= 12;
         ss.fill('0');
         ss << ' ' << hr;

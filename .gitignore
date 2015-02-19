@@ -2,3 +2,5 @@ dobj/
 obj/
 agenda
 agenda-debug
+current-tasks-debug
+old-tasks-debug
