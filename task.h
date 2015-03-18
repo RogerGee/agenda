@@ -17,6 +17,7 @@ namespace agenda
         task_exam,
         task_appmt,
         task_event,
+        task_task,
         task_misc
     };
 

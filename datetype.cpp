@@ -170,7 +170,7 @@ date_t::date_t(string tokens[],int count)
     /* time input sequence grammar:
         (DOW|(DAY|MONTH|YEAR)+ (HOUR(:MINUTE(:SECOND)?)? AM|PM)?)? */
     int i, s;
-    bool useTime;
+    bool useTime, foundDay;
     tm timedata;
     timespec tspec;
     uint16_t originalMonth;
@@ -184,6 +184,7 @@ date_t::date_t(string tokens[],int count)
     timedata.tm_min = 0;
     timedata.tm_sec = 0;
     useTime = false;
+    foundDay = false;
     while (i < count) {
         string& tok = tokens[i];
         string_to_lower(tok);
@@ -199,14 +200,16 @@ date_t::date_t(string tokens[],int count)
                 } while (d != timedata.tm_wday);
                 s = 5;
             }
-            // try reading a month-day value
-            else if (verify_convert(tok,_day,1,31)) {
+            // try reading a month-day value (the range for days and times overlaps, so 
+            // we must be sure we haven't found a day value before now)
+            else if (!foundDay && verify_convert(tok,_day,1,31)) {
                 if (timedata.tm_mon==originalMonth && _day<timedata.tm_mday)
                     // choose day of next month since the next occurange of the
                     // day value is in the next month
                     ++timedata.tm_mon;
                 timedata.tm_mday = _day;
                 ++s;
+                foundDay = true;
             }
             // try reading a year value
             else if (verify_convert(tok,_year,1000,9999)) {

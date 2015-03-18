@@ -37,6 +37,8 @@ task::task(binreader& input)
         return task_appmt;
     if (s == "evnt" || s == "event")
         return task_event;
+    if (s == "task" || s == "job")
+        return task_task;
     if (s == "other" || s == "misc")
         return task_misc;
     throw task_exception("bad task kind string");
@@ -55,7 +57,9 @@ task::task(binreader& input)
     case task_appmt:
         return "appmt";
     case task_event:
-        return "evnt";
+        return "event";
+    case task_task:
+        return "task";
     case task_misc:
         return "misc";
     default:
