@@ -1,5 +1,6 @@
 /* task.cpp */
 #include "task.h"
+#include "compress.h"
 #include <algorithm>
 #include <iostream>
 #include <iomanip>
@@ -67,9 +68,21 @@ task::task(binreader& input)
     }
     return "unknown task";
 }
+static int count_digits(uint32_t num)
+{
+    if (num == 0)
+        return 1;
+
+    int c = 0;
+    while (num > 0) {
+        num /= 10;
+        ++c;
+    }
+    return c;
+}
 void task::print(ostream& stream) const
 {
-    stream << setw(3) << _id << " [" << task_kind_to_string(_kind) <<  "]\t" << setw(30) 
+    stream << setw(count_digits(task_file::get_next_id())) << _id << " [" << task_kind_to_string(_kind) <<  "]\t" << setw(30)
            <<  _desc << "\t[" << _date.to_date_string_withtime() << ']';
 }
 void task::save(binwriter& stream) const
@@ -146,6 +159,27 @@ void task_file::remove_outdated(task_file& dest,vector<const task*>& removed)
     // remove items from the collection (this can't be done while iterating)
     for (size_t i = 0;i < removed.size();++i)
         _tasks.erase(removed[i]->get_id());
+}
+void task_file::rebase()
+{
+    uint32_t id = 1;
+    vector<task*> tasks;
+    for (auto iter = _tasks.begin();iter != _tasks.end();++iter)
+        tasks.push_back(iter->second);
+    std::sort(tasks.begin(),tasks.end(),[](const task* left,const task* right){return left->get_date()<right->get_date();});
+    for (size_t i = 0;i < tasks.size();++i) {
+        tasks[i]->_id = id++;
+    }
+    _modified = true;
+}
+void task_file::flush_tasks()
+{
+    // save old contents into a compressed file
+    compressed_ostream s(_name);
+    print(s);
+    s.wait();
+    _tasks.clear();
+    _modified = true;
 }
 void task_file::print(ostream& stream) const
 {

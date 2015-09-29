@@ -13,6 +13,7 @@ static int agenda_add(int argc,string argv[]);
 static int agenda_remove(int argc,string argv[]);
 static int agenda_edit(int argc,string argv[]);
 static int agenda_old(int argc,string argv[]);
+static int agenda_rebase(int argc,string argv[]);
 static const char* get_current_task_file();
 static const char* get_old_task_file();
 template<typename T> T convert(const string& arg);
@@ -55,6 +56,8 @@ int main(int argc,const char* argv[])
         exitCode = agenda_edit(argc-2,&args[1]);
     else if (args[0] == "old")
         exitCode = agenda_old(argc-2,&args[1]);
+    else if (args[0] == "rebase")
+        exitCode = agenda_rebase(0,NULL);
     else {
         cerr << argv[0] << ": unrecognized command '" << argv[1] << "'\n";
         exitCode = 1;
@@ -175,6 +178,25 @@ int agenda_old(int,string[])
     return 0;
 }
 
+/* the 'rebase' command tells agenda to rebase its task ids on top of
+   only the tasks that are current; this saves a copy of the old tasks
+   in a compressed .old file and reassigns new ids starting at 0 to
+   current tasks */
+int agenda_rebase(int,string[])
+{
+    /* syntax: rebase */
+    try {
+        oldTasks.flush_tasks();
+        currentTasks.rebase();
+    }
+    catch (exception& ex) {
+        cerr << programName << ": rebase: " << ex.what() << '\n';
+        return 1;
+    }
+    cout << programName << ": rebased the task files\n";
+    return 0;
+}
+
 const char* get_current_task_file()
 {
 #ifdef AGENDA_DEBUG
@@ -213,7 +235,6 @@ T convert(const string& arg)
 {
     T value = 0;
     for (size_t i = 0;i < arg.size();++i) {
-        
         if (!isdigit(arg[i]))
             throw runtime_error("argument must be an integer");
         value *= 10;

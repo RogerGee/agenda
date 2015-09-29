@@ -21,10 +21,11 @@ endif
 LIBRARY =
 
 BINSTREAM_H = binstream.h
+COMPRESS_H = compress.h
 DATETYPE_H = datetype.h $(BINSTREAM_H)
 TASK_H = task.h $(DATETYPE_H)
 
-OBJECTS = agenda.o task.o datetype.o binstream.o
+OBJECTS = agenda.o task.o datetype.o binstream.o compress.o
 OBJECTS := $(addprefix $(OBJDIR)/,$(OBJECTS))
 
 all: $(OBJDIR) $(PROGRAM)
@@ -35,12 +36,14 @@ $(PROGRAM): $(OBJECTS)
 
 $(OBJDIR)/agenda.o: agenda.cpp $(TASK_H)
 	$(COMPILE) agenda.cpp -o$(OBJDIR)/agenda.o
-$(OBJDIR)/task.o: task.cpp $(TASK_H)
+$(OBJDIR)/task.o: task.cpp $(TASK_H) $(COMPRESS_H)
 	$(COMPILE) task.cpp -o$(OBJDIR)/task.o
 $(OBJDIR)/datetype.o: datetype.cpp $(DATETYPE_H)
 	$(COMPILE) datetype.cpp -o$(OBJDIR)/datetype.o
 $(OBJDIR)/binstream.o: binstream.cpp $(BINSTREAM_H)
 	$(COMPILE) binstream.cpp -o$(OBJDIR)/binstream.o
+$(OBJDIR)/compress.o: compress.cpp $(COMPRESS_H)
+	$(COMPILE) compress.cpp -o$(OBJDIR)/compress.o
 
 $(OBJDIR):
 	mkdir $(OBJDIR)

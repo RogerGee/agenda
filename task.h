@@ -76,6 +76,8 @@ namespace agenda
         void add_task(task* item);
         task* remove(uint32_t id); // return removed task or NULL if not found
         void remove_outdated(task_file& dest,std::vector<const task*>& removed); // remove all outdated tasks and place in destination task_file
+        void rebase(); // reassign ids starting at zero to tasks (uses chronological ordering for the assignment)
+        void flush_tasks(); // remove all tasks from this task file (saves them in compressed file)
 
         void print(std::ostream&) const;
 
