@@ -1,6 +1,9 @@
 #include "task.h"
 #include <iostream>
 #include <cctype>
+#include <cerrno>
+#include <sys/stat.h>
+#include <sys/types.h>
 using namespace std;
 using namespace agenda;
 
@@ -14,6 +17,9 @@ static int agenda_remove(int argc,string argv[]);
 static int agenda_edit(int argc,string argv[]);
 static int agenda_old(int argc,string argv[]);
 static int agenda_rebase(int argc,string argv[]);
+#ifndef AGENDA_DEBUG
+static void check_dir(const char*);
+#endif
 static const char* get_current_task_file();
 static const char* get_old_task_file();
 template<typename T> T convert(const string& arg);
@@ -197,6 +203,16 @@ int agenda_rebase(int,string[])
     return 0;
 }
 
+#ifndef AGENDA_DEBUG
+void check_dir(const char* dir)
+{
+    if (mkdir(dir,0777) == -1 && errno != EEXIST) {
+        cerr << "agenda: error: could not create directory for agenda files" << endl;
+        exit(EXIT_FAILURE);
+    }
+}
+#endif
+
 const char* get_current_task_file()
 {
 #ifdef AGENDA_DEBUG
@@ -208,7 +224,9 @@ const char* get_current_task_file()
         if (HOME == NULL)
             throw home_directory_not_set(0);
         file = HOME;
-        file += "/.agenda-current";
+        file += "/.agenda";
+        check_dir(file.c_str());
+        file += "/agenda-current";
     }
     return file.c_str();
 #endif
@@ -224,7 +242,9 @@ const char* get_old_task_file()
         if (HOME == NULL)
             throw home_directory_not_set(0);
         file = HOME;
-        file += "/.agenda-old";
+        file += "/.agenda";
+        check_dir(file.c_str());
+        file += "/agenda-old";
     }
     return file.c_str();
 #endif

@@ -1,0 +1,72 @@
+agenda
+----------------------------------------------------------------------
+This project provides a stupid command-line agenda tool. The agenda
+tool essentially stores tasks that you need to complete (like on your
+server or in life). Each task is given a unique id, followed by a
+kind, description and date/time. The agenda orders the tasks by
+date/time and prints outdated tasks. The 'agenda old' command displays
+old tasks that have not been rebased. Rebasing involves taking an old
+task file and compressing it down while rebasing the ids of current,
+unfinished tasks.
+----------------------------------------------------------------------
+[operation] agenda supports the following commands:
+
+    stat
+    add
+    remove OR rm
+    edit OR ed
+    old
+    rebase
+
+With no arguments, agenda runs 'agenda stat'.
+
+Agenda keeps files in the user home directory under the .agenda
+subdirectory:
+
+    ~/.agenda/agenda-current       current agenda tasks
+    ~/.agenda/agenda-old           old-agenda-tasks
+
+Rebased files are also stored there and are numbered.
+----------------------------------------------------------------------
+[commands] detailed command descriptions:
+
+    stat - display current tasks
+
+    add <kind> <desc> [date/time] - add new task
+        where <kind> is one of:
+            hw OR homework
+            paper
+            proj OR project
+            exam OR test
+            app OR appmt OR appointment
+            evnt OR event
+            task OR job
+            other OR misc
+        where [date/time] is a date and time with the following syntax:
+            <([day] [month] [year]) | day-of-week> [time] [am|pm]
+
+            examples:
+                oct 11:50 pm        -- current day of october at 11:50 pm
+                8 11:50             -- 8th of current month at 11:50 am
+                2034                -- current day of current month in year 2034
+                fri 8 pm            -- next friday at 8 pm
+                monday              -- next monday
+
+    edit <id> [--date <date-string>] [--desc <desc-string>] [--kind <kind>]
+         - edit specified existing task
+
+    remove <id> - remove specified existing task
+
+    old - show old tasks
+
+    rebase - rebase new tasks starting with id=1; compress view of old
+tasks to versioned file
+----------------------------------------------------------------------
+[building] agenda is designed for systems that provide the POSIX
+standard programming interface; the repository includes a makefile
+that simplifies the process. You need to have a compiler that fully
+supports C++11.
+
+You can use the makefile's 'install' rule to install agenda in the
+standard way; you may require elevated priviledges.
+----------------------------------------------------------------------
