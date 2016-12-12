@@ -9,6 +9,23 @@
 using namespace std;
 using namespace agenda;
 
+#ifdef __APPLE__
+#define CLOCK_REALTIME 0
+#include <sys/time.h>
+// clock_gettime() is not available on OS X.
+static int clock_gettime(int /*clk_id*/, timespec* t)
+{
+    timeval now;
+    int rv = gettimeofday(&now,NULL);
+    if (rv) {
+        return rv;
+    }
+    t->tv_sec = now.tv_sec;
+    t->tv_nsec = now.tv_usec * 1000;
+    return 0;
+}
+#endif
+
 void string_to_lower(string& s) // this is referenced externally
 {
     for (size_t j = 0;j < s.size();++j)
@@ -200,7 +217,7 @@ date_t::date_t(string tokens[],int count)
                 } while (d != timedata.tm_wday);
                 s = 5;
             }
-            // try reading a month-day value (the range for days and times overlaps, so 
+            // try reading a month-day value (the range for days and times overlaps, so
             // we must be sure we haven't found a day value before now)
             else if (!foundDay && verify_convert(tok,_day,1,31)) {
                 if (timedata.tm_mon==originalMonth && _day<timedata.tm_mday)

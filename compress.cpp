@@ -112,7 +112,7 @@ static string compressed_file_version(const string& fileName)
 
 // compressed_ostream
 compressed_ostream::compressed_ostream(const string& fileName)
-    : buf(new pipebuf), pid(-1)
+    : ostream(new pipebuf), buf(static_cast<pipebuf*>(rdbuf())), pid(-1)
 {
     // open output file
     int out = open(compressed_file_version(fileName).c_str(),O_CREAT|O_TRUNC|O_WRONLY,0666);
