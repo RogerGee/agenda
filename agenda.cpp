@@ -1,3 +1,8 @@
+/*
+ * agenda.cpp
+ *
+ */
+
 #include "task.h"
 #include <iostream>
 #include <cctype>
@@ -52,6 +57,11 @@ int main(int argc,const char* argv[])
     }
     if (argc <= 1)
         exitCode = agenda_stat(0,NULL);
+    else if (args[0] == "--version") {
+#ifdef AGENDA_VERSION
+        cout << "agenda " << AGENDA_VERSION << endl;
+#endif
+    }
     else if (args[0] == "stat")
         exitCode = agenda_stat(argc-2,&args[1]);
     else if (args[0] == "add")

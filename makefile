@@ -28,6 +28,11 @@ TASK_H = task.h $(DATETYPE_H)
 OBJECTS = agenda.o task.o datetype.o binstream.o compress.o
 OBJECTS := $(addprefix $(OBJDIR)/,$(OBJECTS))
 
+VERSION = $(shell git describe --tags)
+ifneq ($(VERSION),)
+AGENDA_VERSION = '-DAGENDA_VERSION="$(VERSION)"'
+endif
+
 all: $(OBJDIR) $(PROGRAM)
 debug: $(OBJDIR) $(PROGRAM)
 
@@ -35,7 +40,7 @@ $(PROGRAM): $(OBJECTS)
 	$(LINK) $(OBJECTS) $(LIBRARY) -o$(PROGRAM)
 
 $(OBJDIR)/agenda.o: agenda.cpp $(TASK_H)
-	$(COMPILE) agenda.cpp -o$(OBJDIR)/agenda.o
+	$(COMPILE) agenda.cpp $(AGENDA_VERSION) -o$(OBJDIR)/agenda.o
 $(OBJDIR)/task.o: task.cpp $(TASK_H) $(COMPRESS_H)
 	$(COMPILE) task.cpp -o$(OBJDIR)/task.o
 $(OBJDIR)/datetype.o: datetype.cpp $(DATETYPE_H)
